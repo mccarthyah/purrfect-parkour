@@ -19,7 +19,7 @@ The GitHub Actions workflow runs the project on Godot 4.7.2 headless: editor imp
 
 ```sh
 godot --headless --editor --path . --quit
-godot --headless --path . --script res://tests/game_smoke_test.gd
+godot --headless --path . res://tests/game_smoke_test.tscn
 godot --headless --path . --quit-after 5
 ```
 

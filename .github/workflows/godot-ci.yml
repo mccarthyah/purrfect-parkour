@@ -17,6 +17,6 @@ jobs:
       - name: Import project and validate scripts
         run: godot --headless --editor --path . --quit
       - name: Test gameplay loop headlessly
-        run: godot --headless --path . --script res://tests/game_smoke_test.gd
+        run: timeout 20s godot --headless --path . res://tests/game_smoke_test.tscn
       - name: Run project smoke test
         run: timeout 20s godot --headless --path . --quit-after 5

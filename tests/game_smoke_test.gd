@@ -1,7 +1,7 @@
-extends SceneTree
+extends Node
 
-func _initialize() -> void:
-	call_deferred("_run_checks")
+func _ready() -> void:
+	_run_checks()
 
 func _run_checks() -> void:
 	var packed: PackedScene = load("res://scenes/game.tscn")
@@ -9,8 +9,7 @@ func _run_checks() -> void:
 		_fail("Could not load the main game scene.")
 		return
 	var game: Variant = packed.instantiate()
-	root.add_child(game)
-	await process_frame
+	add_child(game)
 
 	if game.state != "title":
 		_fail("Game should begin on the title screen.")
@@ -42,8 +41,8 @@ func _run_checks() -> void:
 		_fail("Restart should reset the medal collection.")
 		return
 	print("Purrfect Parkour smoke test passed: 13 platforms, 18 medals, spring bounce, scoring, restart.")
-	quit(0)
+	get_tree().quit(0)
 
 func _fail(message: String) -> void:
 	push_error("Purrfect Parkour smoke test failed: " + message)
-	quit(1)
+	get_tree().quit(1)
