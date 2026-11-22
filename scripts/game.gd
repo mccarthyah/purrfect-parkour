@@ -229,7 +229,7 @@ func _draw() -> void:
 	for i in range(36):
 		var x := float(i) * 190 - 70
 		var height := 95.0 + float((i * 47) % 115)
-		var col := [Color("91c6ca"), Color("8dbdc4"), Color("9bcbd0")][i % 3]
+		var col: Color = [Color("91c6ca"), Color("8dbdc4"), Color("9bcbd0")][i % 3]
 		draw_rect(Rect2(x, 360-height, 145, height+80), col)
 		draw_rect(Rect2(x+18, 385-height, 44, 25), Color("d5e8d2", 0.8))
 		draw_rect(Rect2(x+83, 385-height, 40, 25), Color("f8d6a2", 0.85))
