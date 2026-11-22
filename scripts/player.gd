@@ -37,7 +37,7 @@ func _physics_process(delta: float) -> void:
 		walk_time += delta * 12.0
 	velocity.x = input_x * RUN_SPEED
 
-	var near_tree := game.is_near_tree(global_position.x)
+	var near_tree: bool = game.is_near_tree(global_position.x)
 	climbing = near_tree and (Input.is_action_pressed("climb_up") or Input.is_action_pressed("climb_down"))
 	if climbing:
 		velocity.y = 0
