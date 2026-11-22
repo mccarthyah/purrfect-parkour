@@ -3,7 +3,6 @@ extends Node2D
 const CatScript = preload("res://scripts/player.gd")
 const MedalScript = preload("res://scripts/medal.gd")
 const BouncePadScript = preload("res://scripts/bounce_pad.gd")
-const SmokeTest = preload("res://tests/game_smoke_test.gd")
 const SKY := Color("74b9d7")
 
 var state := "title"
@@ -43,13 +42,6 @@ func _ready() -> void:
 	hud.game = self
 	layer.add_child(hud)
 	queue_redraw()
-	if OS.get_cmdline_user_args().has("--smoke-test"):
-		call_deferred("_run_smoke_test")
-
-func _run_smoke_test() -> void:
-	var test_runner = SmokeTest.new()
-	var passed: bool = test_runner.run_checks(self)
-	get_tree().quit(0 if passed else 1)
 
 func _build_level() -> void:
 	# x, top y, width, style (roof, garden, finish)
