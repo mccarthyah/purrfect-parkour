@@ -7,6 +7,7 @@ const CLIMB_SPEED := 210.0
 var game
 var facing := 1.0
 var climbing := false
+var air_jump_available := true
 var walk_time := 0.0
 var invulnerable := 0.0
 var spawn_point := Vector2(100, 390)
@@ -46,16 +47,23 @@ func _physics_process(delta: float) -> void:
 			velocity.y = CLIMB_SPEED
 		elif not is_on_floor():
 			velocity.y = 0
-		if Input.is_action_just_pressed("jump"):
+		if Input.is_action_just_pressed("jump") and not Input.is_action_pressed("climb_up"):
 			climbing = false
 			velocity.y = JUMP_SPEED
 	else:
-		if not is_on_floor():
+		if is_on_floor():
+			air_jump_available = true
+			if velocity.y > 0:
+				velocity.y = 0
+		else:
 			velocity.y += GRAVITY * delta
-		elif velocity.y > 0:
-			velocity.y = 0
-		if Input.is_action_just_pressed("jump") and is_on_floor():
-			velocity.y = JUMP_SPEED
+		if Input.is_action_just_pressed("jump"):
+			if is_on_floor():
+				velocity.y = JUMP_SPEED
+			elif air_jump_available:
+				velocity.y = JUMP_SPEED * 0.88
+				air_jump_available = false
+				game.show_message("Air-pounce! Great save!", 1.0)
 
 	move_and_slide()
 	if position.y > 760:

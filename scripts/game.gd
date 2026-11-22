@@ -12,7 +12,7 @@ var platforms: Array[Dictionary] = []
 var trees: Array[Vector2] = []
 var medals: Array = []
 var score := 0
-var total_medals := 10
+var total_medals := 18
 var checkpoint := Vector2(100, 390)
 var message_timer := 0.0
 var message := ""
@@ -29,7 +29,7 @@ func _ready() -> void:
 	camera.position_smoothing_enabled = true
 	camera.position_smoothing_speed = 5.5
 	camera.limit_left = -480
-	camera.limit_right = 3880
+	camera.limit_right = 6750
 	camera.limit_top = -270
 	camera.limit_bottom = 920
 	add_child(camera)
@@ -51,7 +51,14 @@ func _build_level() -> void:
 	_add_platform(1780, 395, 430, "roof")
 	_add_platform(2335, 310, 220, "garden")
 	_add_platform(2690, 395, 650, "finish")
-	trees = [Vector2(735, 342), Vector2(1560, 317), Vector2(2445, 302)]
+	# A second district turns the run into a longer adventure through the moonlit market.
+	_add_platform(3520, 350, 230, "garden")
+	_add_platform(3870, 415, 400, "night")
+	_add_platform(4390, 325, 220, "garden")
+	_add_platform(4710, 390, 420, "night")
+	_add_platform(5220, 305, 230, "garden")
+	_add_platform(5550, 390, 720, "night_finish")
+	trees = [Vector2(735, 342), Vector2(1560, 317), Vector2(2445, 302), Vector2(3635, 342), Vector2(4500, 317), Vector2(5335, 297)]
 	# Shiny fish medals sit on tempting routes and high branches.
 	_add_medal(250, 365)
 	_add_medal(565, 330)
@@ -63,6 +70,15 @@ func _build_level() -> void:
 	_add_medal(2190, 325)
 	_add_medal(2450, 255)
 	_add_medal(3025, 338)
+	# Moonlight Market — eight extra medals reward brave high jumps and tree climbs.
+	_add_medal(3585, 292)
+	_add_medal(3700, 255)
+	_add_medal(4045, 365)
+	_add_medal(4450, 265)
+	_add_medal(4800, 335)
+	_add_medal(5160, 320)
+	_add_medal(5335, 245)
+	_add_medal(5890, 330)
 
 func _add_platform(x: float, top: float, width: float, style: String) -> void:
 	var body := StaticBody2D.new()
@@ -106,6 +122,7 @@ func start_game() -> void:
 		state = "playing"
 		cat.position = Vector2(100, 390)
 		cat.velocity = Vector2.ZERO
+		cat.air_jump_available = true
 		camera.position_smoothing_enabled = false
 		camera.position = cat.position + Vector2(160, -130)
 		camera.position_smoothing_enabled = true
@@ -120,6 +137,7 @@ func restart_game() -> void:
 		medal.queue_redraw()
 	cat.position = Vector2(100, 390)
 	cat.velocity = Vector2.ZERO
+	cat.air_jump_available = true
 	state = "playing"
 	camera.position_smoothing_enabled = false
 	camera.position = cat.position + Vector2(160, -130)
@@ -140,9 +158,15 @@ func collect_medal(medal: Area2D) -> void:
 func cat_fell() -> void:
 	cat.position = checkpoint
 	cat.velocity = Vector2.ZERO
+	cat.air_jump_available = true
 	cat.invulnerable = 1.0
-	message = "Whoops! Try that jump again."
-	message_timer = 1.7
+	show_message("Whoops! Try that jump again.", 1.7)
+
+func show_message(text: String, duration: float = 1.4) -> void:
+	message = text
+	message_timer = duration
+	if hud:
+		hud.queue_redraw()
 
 func _process(delta: float) -> void:
 	elapsed += delta
@@ -155,25 +179,37 @@ func _process(delta: float) -> void:
 			checkpoint = Vector2(1815, 365)
 			message = "Checkpoint! You're doing great!"
 			message_timer = 2.0
-		if cat.position.x > 3220:
+		if cat.position.x > 3900 and checkpoint.x < 3800:
+			checkpoint = Vector2(3990, 385)
+			message = "Moonlight Market checkpoint! Onward!"
+			message_timer = 2.0
+		if cat.position.x > 6150:
 			state = "won"
 			cat.velocity = Vector2.ZERO
-		if cat.position.x > 3120:
-			message = "Home stretch! Reach the rooftop garden!"
+		if cat.position.x > 5900:
+			message = "Home stretch! The market rooftop is just ahead!"
 			message_timer = maxf(message_timer, 0.2)
 		hud.queue_redraw()
 	queue_redraw()
 
 func _draw() -> void:
 	# Big sky backdrop; the parallax layers create a breezy storybook city.
-	draw_rect(Rect2(-1000, -800, 6000, 1800), SKY)
-	draw_rect(Rect2(-1000, 260, 6000, 600), Color("ffe6b9"))
+	draw_rect(Rect2(-1000, -800, 8000, 1800), SKY)
+	draw_rect(Rect2(-1000, 260, 8000, 600), Color("ffe6b9"))
+	# The skyline shifts into a gentle, starry twilight at the second district.
+	draw_rect(Rect2(3400, -800, 4000, 1800), Color(0.22, 0.25, 0.48, 0.30))
 	# Sun and drifting clouds
 	draw_circle(Vector2(780, 105), 45, Color("ffe9a5"))
-	for cloud in [Vector2(150,115), Vector2(490,185), Vector2(980,125), Vector2(1430,165), Vector2(2110,110), Vector2(2790,160), Vector2(3250,95)]:
+	draw_circle(Vector2(4110, 118), 38, Color("fff0c7"))
+	draw_circle(Vector2(4125, 105), 37, Color("93a9c8"))
+	for i in range(28):
+		var star_x := 3500 + float((i * 173) % 3000)
+		var star_y := 34 + float((i * 79) % 190)
+		draw_circle(Vector2(star_x, star_y), 1.5 if i % 4 == 0 else 1.0, Color("fff0bd", 0.75))
+	for cloud in [Vector2(150,115), Vector2(490,185), Vector2(980,125), Vector2(1430,165), Vector2(2110,110), Vector2(2790,160), Vector2(3250,95), Vector2(3760,145), Vector2(4820,115), Vector2(5730,160), Vector2(6430,105)]:
 		_draw_cloud(cloud)
 	# Distant pastel city silhouettes
-	for i in range(19):
+	for i in range(36):
 		var x := float(i) * 190 - 70
 		var height := 95.0 + float((i * 47) % 115)
 		var col := [Color("91c6ca"), Color("8dbdc4"), Color("9bcbd0")][i % 3]
@@ -189,14 +225,22 @@ func _draw() -> void:
 		var y: float = p.y
 		var w: float = p.w
 		var style: String = p.style
-		var wall := Color("e98475") if style == "roof" else (Color("8cbb79") if style == "garden" else Color("e9a755"))
+		var wall := Color("e98475")
+		if style == "garden":
+			wall = Color("8cbb79")
+		elif style == "finish":
+			wall = Color("e9a755")
+		elif style == "night":
+			wall = Color("536b91")
+		elif style == "night_finish":
+			wall = Color("8571a7")
 		draw_rect(Rect2(x, y, w, 220), wall)
 		draw_rect(Rect2(x, y, w, 16), Color("fff1d2"))
-		draw_rect(Rect2(x, y+16, w, 7), Color("d76566") if style != "garden" else Color("6b9e63"))
+		draw_rect(Rect2(x, y+16, w, 7), Color("d76566") if style == "roof" or style == "finish" else (Color("d7bd78") if style == "night" or style == "night_finish" else Color("6b9e63")))
 		# Repeated windows and tiny ledge planters
 		for wx in range(26, int(w)-10, 62):
-			draw_rect(Rect2(x+wx, y+57, 30, 42), Color("526c82", 0.8))
-			draw_rect(Rect2(x+wx+4, y+61, 22, 33), Color("f9dd9d"))
+			draw_rect(Rect2(x+wx, y+57, 30, 42), Color("35435f", 0.9) if style == "night" or style == "night_finish" else Color("526c82", 0.8))
+			draw_rect(Rect2(x+wx+4, y+61, 22, 33), Color("ffe5a3") if style == "night" or style == "night_finish" else Color("f9dd9d"))
 			draw_line(Vector2(x+wx+15, y+61), Vector2(x+wx+15, y+94), Color("d18d63"), 2)
 		if style == "garden":
 			for plant_x in range(24, int(w)-15, 38):
@@ -218,10 +262,14 @@ func _draw() -> void:
 		for ring in range(3):
 			draw_arc(Vector2(tree.x, tree.y-24-ring*34), 13, 0, TAU, 20, Color("f6d27d", 0.75), 2)
 	# Finish marker
-	draw_rect(Rect2(3260, 310, 5, 85), Color("fff2d1"))
-	draw_colored_polygon(PackedVector2Array([Vector2(3265,310),Vector2(3320,330),Vector2(3265,350)]), Color("f28a74"))
+	draw_rect(Rect2(6215, 305, 6, 85), Color("fff2d1"))
+	draw_colored_polygon(PackedVector2Array([Vector2(6221,305),Vector2(6285,328),Vector2(6221,351)]), Color("f28a74"))
+	# A little lantern gate welcomes the cat into the night market.
+	draw_rect(Rect2(3445, 243, 8, 108), Color("9b674f"))
+	draw_rect(Rect2(3375, 238, 150, 14), Color("efc76e"))
+	draw_circle(Vector2(3450, 265), 10, Color("ffe7a0"))
 	for i in range(8):
-		draw_circle(Vector2(3180 + i*18, 355 + sin(elapsed*2+i)*4), 3, Color("fff4cc"))
+		draw_circle(Vector2(6110 + i*18, 355 + sin(elapsed*2+i)*4), 3, Color("fff4cc"))
 
 func _draw_cloud(at: Vector2) -> void:
 	var c := Color(1, 1, 1, 0.78)

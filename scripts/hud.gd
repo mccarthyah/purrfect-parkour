@@ -40,14 +40,15 @@ func _draw() -> void:
 func _draw_title() -> void:
 	_draw_panel(Rect2(200, 44, 560, 440), Color("fff5dc", 0.94))
 	_draw_text_center("PURRFECT PARKOUR", 133, 43, Color("e87961"))
-	_draw_text_center("A rooftop adventure for curious cats!", 169, 19, INK)
+	_draw_text_center("Two rooftop districts for curious cats!", 169, 19, INK)
 	# Little decorative fish and paw prints
 	_draw_paw(Vector2(264, 215), 0.72, Color("f3ac67", 0.8))
 	_draw_paw(Vector2(702, 213), 0.72, Color("f3ac67", 0.8))
 	_draw_fish(Vector2(480, 224), 1.0)
 	_draw_text_center("Jump rooftops • climb trees • collect fish medals", 274, 16, INK)
 	_draw_text_center("Move: A / D or ← / →      Jump: Space / ↑", 308, 15, Color("59687a"))
-	_draw_text_center("At a tree, hold ↑ or ↓ to climb!", 333, 15, Color("59687a"))
+	_draw_text_center("At trees, hold ↑ or ↓ to climb!", 333, 15, Color("59687a"))
+	_draw_text_center("Tap Jump again in the air for an extra air-pounce!", 354, 13, Color("8a7d6d"))
 	var mouse := get_viewport().get_mouse_position()
 	var color := Color("f2a94e") if BUTTON.has_point(mouse) else Color("efb94f")
 	_draw_button(BUTTON, color, "LET'S PLAY!")
@@ -58,13 +59,15 @@ func _draw_game_hud() -> void:
 	_draw_fish(Vector2(43, 43), 0.62)
 	_draw_text("FISH  %02d / %02d" % [game.score, game.total_medals], Vector2(63, 49), 17, INK)
 	_draw_panel(Rect2(354, 16, 252, 42), Color("fff5dc", 0.82))
-	_draw_text_center("ROOFTOP RUN  ✦  %d%%" % int(clampf(game.cat.position.x / 3220.0 * 100, 0, 100)), 44, 14, INK)
+	var district := "ROOFTOP RUN" if game.cat.position.x < 3400 else "MOONLIGHT MARKET"
+	var progress := int(clampf(game.cat.position.x / 6150.0 * 100, 0, 100))
+	_draw_text_center("%s  ✦  %d%%" % [district, progress], 44, 13, INK)
 	_draw_panel(Rect2(712, 16, 230, 56), Color("fff5dc", 0.92))
 	_draw_text("A / D  Move     SPACE  Jump", Vector2(726, 39), 11, INK)
 	_draw_text("↑ / ↓ at trees   •   ESC pause", Vector2(726, 57), 11, INK)
 	# Progress bar
 	draw_rect(Rect2(369, 54, 222, 4), Color("d8d2bd"))
-	draw_rect(Rect2(369, 54, 222 * clampf(game.cat.position.x / 3220.0, 0, 1), 4), Color("efad49"))
+	draw_rect(Rect2(369, 54, 222 * clampf(game.cat.position.x / 6150.0, 0, 1), 4), Color("efad49"))
 
 func _draw_message(text: String) -> void:
 	_draw_panel(Rect2(278, 80, 404, 42), Color("fff5dc", 0.94))
