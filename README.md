@@ -15,10 +15,11 @@ Race through two districts—the sunny Rooftop Run and the starry Moonlight Mark
 
 ## Testing
 
-The GitHub Actions workflow runs the project on Godot 4.7.2 headless: first editor import/script validation, then a short runtime smoke test. Locally, the same checks are:
+The GitHub Actions workflow runs the project on Godot 4.7.2 headless: editor import/script validation, a gameplay smoke test (level contents, spring launch, medal scoring, and restart), and a short runtime check. Locally, run:
 
 ```sh
 godot --headless --editor --path . --quit
+godot --headless --path . --script res://tests/game_smoke_test.gd
 godot --headless --path . --quit-after 5
 ```
 
