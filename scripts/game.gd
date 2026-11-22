@@ -2,6 +2,7 @@ extends Node2D
 
 const CatScript = preload("res://scripts/player.gd")
 const MedalScript = preload("res://scripts/medal.gd")
+const BouncePadScript = preload("res://scripts/bounce_pad.gd")
 const SKY := Color("74b9d7")
 
 var state := "title"
@@ -79,6 +80,11 @@ func _build_level() -> void:
 	_add_medal(5160, 320)
 	_add_medal(5335, 245)
 	_add_medal(5890, 330)
+	# Springy rooftop cushions launch the cat toward high medals and safe landings.
+	_add_bounce_pad(410, 420)
+	_add_bounce_pad(1190, 410)
+	_add_bounce_pad(2000, 395)
+	_add_bounce_pad(4980, 390)
 
 func _add_platform(x: float, top: float, width: float, style: String) -> void:
 	var body := StaticBody2D.new()
@@ -98,6 +104,17 @@ func _add_medal(x: float, y: float) -> void:
 	medal.position = Vector2(x, y)
 	add_child(medal)
 	medals.append(medal)
+
+func _add_bounce_pad(x: float, top: float) -> void:
+	var pad = BouncePadScript.new()
+	pad.position = Vector2(x, top)
+	pad.game = self
+	add_child(pad)
+
+func bounce_cat(body) -> void:
+	body.velocity.y = -790.0
+	body.air_jump_available = true
+	show_message("Boing! Spring-paws!", 1.0)
 
 func is_near_tree(x: float) -> bool:
 	for tree in trees:

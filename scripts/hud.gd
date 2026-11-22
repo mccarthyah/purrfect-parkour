@@ -48,7 +48,7 @@ func _draw_title() -> void:
 	_draw_text_center("Jump rooftops • climb trees • collect fish medals", 274, 16, INK)
 	_draw_text_center("Move: A / D or ← / →      Jump: Space / ↑", 308, 15, Color("59687a"))
 	_draw_text_center("At trees, hold ↑ or ↓ to climb!", 333, 15, Color("59687a"))
-	_draw_text_center("Tap Jump again in the air for an extra air-pounce!", 354, 13, Color("8a7d6d"))
+	_draw_text_center("Air-pounce with a second jump; spring pads launch you!", 354, 13, Color("8a7d6d"))
 	var mouse := get_viewport().get_mouse_position()
 	var color := Color("f2a94e") if BUTTON.has_point(mouse) else Color("efb94f")
 	_draw_button(BUTTON, color, "LET'S PLAY!")
@@ -64,7 +64,7 @@ func _draw_game_hud() -> void:
 	_draw_text_center("%s  ✦  %d%%" % [district, progress], 44, 13, INK)
 	_draw_panel(Rect2(712, 16, 230, 56), Color("fff5dc", 0.92))
 	_draw_text("A / D  Move     SPACE  Jump", Vector2(726, 39), 11, INK)
-	_draw_text("↑ / ↓ at trees   •   ESC pause", Vector2(726, 57), 11, INK)
+	_draw_text("↑ / ↓ climb • pads boost • ESC pause", Vector2(726, 57), 11, INK)
 	# Progress bar
 	draw_rect(Rect2(369, 54, 222, 4), Color("d8d2bd"))
 	draw_rect(Rect2(369, 54, 222 * clampf(game.cat.position.x / 6150.0, 0, 1), 4), Color("efad49"))

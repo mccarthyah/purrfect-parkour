@@ -11,7 +11,7 @@ Open this folder in Godot 4.7.2 and press **F6** (or run the project). On the ti
 - **Climb:** Hold Up or Down while beside a tree
 - **Pause / resume:** Escape
 
-Race through two districts—the sunny Rooftop Run and the starry Moonlight Market—to reach the garden rooftop at the far end. Find all 18 fish medals, use your extra mid-air air-pounce to rescue tricky jumps, and look for two checkpoints along the way. Falling just sends you back to your last safe rooftop.
+Race through two districts—the sunny Rooftop Run and the starry Moonlight Market—to reach the garden rooftop at the far end. Find all 18 fish medals, use your extra mid-air air-pounce and rooftop spring pads to rescue tricky jumps, and look for two checkpoints along the way. Falling just sends you back to your last safe rooftop.
 
 ## Testing
 
