@@ -23,3 +23,14 @@ jobs:
             echo 'Godot reported a script/parser error during startup.'
             exit 1
           fi
+      - name: Load all ten courses headlessly
+        run: |
+          PURRFECT_TEST_ALL_LEVELS=1 timeout 20s godot --headless --path . 2>&1 | tee /tmp/godot-levels.log
+          if ! grep -q 'PURRFECT_LEVELS_SMOKE_TEST_PASSED: 10 courses loaded.' /tmp/godot-levels.log; then
+            echo 'The ten-course runtime check did not complete.'
+            exit 1
+          fi
+          if grep -Eq 'Parser Error|Parse Error|SCRIPT ERROR|Failed to load script' /tmp/godot-levels.log; then
+            echo 'Godot reported a script/parser error while loading courses.'
+            exit 1
+          fi

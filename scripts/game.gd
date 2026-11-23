@@ -11,6 +11,7 @@ const Art = preload("res://scripts/art.gd")
 const ExtraLevels = preload("res://scripts/extra_levels.gd")
 const MENU_FPS := 12
 const BACKGROUND_Z := -2
+const PROGRESS_PATH := "user://progress.cfg"
 
 var state := "title":
 	set(value):
@@ -26,6 +27,8 @@ var route_lines: Array[Dictionary] = []
 var trees: Array[Vector2] = []
 var medals: Array = []
 var score := 0
+var unlocked_level := 1
+var campaign_complete := false
 var rescue_count := 0
 var helicopter: Node2D
 var total_medals := 0
@@ -43,6 +46,7 @@ var message_timer := 0.0
 var message := ""
 
 func _ready() -> void:
+	_load_progress()
 	_update_frame_limit()
 	z_index = BACKGROUND_Z
 	add_to_group("game")
@@ -70,10 +74,61 @@ func _ready() -> void:
 	main_menu = MainMenu.new()
 	main_menu.game = self
 	layer.add_child(main_menu)
+	if OS.get_environment("PURRFECT_TEST_ALL_LEVELS") == "1":
+		call_deferred("_run_campaign_smoke_test")
+
+func _run_campaign_smoke_test() -> void:
+	var level_count := 1 + ExtraLevels.LEVELS.size()
+	for number in range(1, level_count + 1):
+		_load_level(number)
+		if platforms.size() < 2:
+			push_error("Level %d has too few rooftops." % number)
+			get_tree().quit(1)
+			return
+		if total_medals != medals.size() or total_medals == 0:
+			push_error("Level %d has an invalid medal count." % number)
+			get_tree().quit(1)
+			return
+		if finish_x <= spawn.x:
+			push_error("Level %d has an invalid finish point." % number)
+			get_tree().quit(1)
+			return
+	print("PURRFECT_LEVELS_SMOKE_TEST_PASSED: %d courses loaded." % level_count)
+	get_tree().quit(0)
 
 func set_gameplay_fps(fps: int) -> void:
 	gameplay_fps = fps
 	_update_frame_limit()
+
+func play_label() -> String:
+	if campaign_complete:
+		return "PLAY AGAIN"
+	return "CONTINUE" if unlocked_level > 1 else "PLAY"
+
+func _load_progress() -> void:
+	var config := ConfigFile.new()
+	if config.load(PROGRESS_PATH) != OK:
+		return
+	var last_level := 1 + ExtraLevels.LEVELS.size()
+	unlocked_level = clampi(int(config.get_value("campaign", "unlocked_level", 1)), 1, last_level)
+	campaign_complete = bool(config.get_value("campaign", "complete", false))
+
+func _save_progress() -> void:
+	var config := ConfigFile.new()
+	config.set_value("campaign", "unlocked_level", unlocked_level)
+	config.set_value("campaign", "complete", campaign_complete)
+	var error := config.save(PROGRESS_PATH)
+	if error != OK:
+		push_warning("Could not save campaign progress: %s" % error_string(error))
+
+func _record_level_completion() -> void:
+	var last_level := 1 + ExtraLevels.LEVELS.size()
+	if level_number >= last_level:
+		campaign_complete = true
+		unlocked_level = 1
+	else:
+		unlocked_level = maxi(unlocked_level, level_number + 1)
+	_save_progress()
 
 func _update_frame_limit() -> void:
 	Engine.max_fps = gameplay_fps if state == "playing" else MENU_FPS
@@ -252,9 +307,15 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func start_game() -> void:
 	if state == "title":
+		var start_level := 1 if campaign_complete else unlocked_level
+		if level_number != start_level:
+			_load_level(start_level)
+		if campaign_complete:
+			campaign_complete = false
+			_save_progress()
 		main_menu.hide()
 		state = "playing"
-		show_message("Level 1 · " + level_name(), 2.0)
+		show_message("Level %d · %s" % [level_number, level_name()], 2.0)
 
 func continue_game() -> void:
 	if state != "won":
@@ -262,6 +323,8 @@ func continue_game() -> void:
 	var next := level_number + 1 if has_next_level() else 1
 	if next == 1:
 		rescue_count = 0
+		campaign_complete = false
+		_save_progress()
 	_load_level(next)
 	state = "playing"
 	show_message("Level %d · %s" % [level_number, level_name()], 2.0)
@@ -325,6 +388,7 @@ func _process(delta: float) -> void:
 			checkpoint_index += 1
 			show_message("Checkpoint reached", 2.0)
 		if cat.position.x > finish_x:
+			_record_level_completion()
 			state = "won"
 			cat.velocity = Vector2.ZERO
 

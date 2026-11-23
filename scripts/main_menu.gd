@@ -35,7 +35,7 @@ func _ready() -> void:
 	load_settings()
 
 	var home := _page("home")
-	play_button = _button(home, Rect2(78, 284, 328, 60), "PLAY", "play", _play, true)
+	play_button = _button(home, Rect2(78, 284, 328, 60), game.play_label(), "play", _play, true)
 	settings_button = _button(home, Rect2(78, 355, 328, 49), "SETTINGS", "settings", _open_settings)
 	about_button = _button(home, Rect2(78, 415, 328, 49), "ABOUT", "about", _open_about)
 	_link_focus([play_button, settings_button, about_button])

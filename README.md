@@ -1,6 +1,6 @@
 # Tabby Roof Run
 
-A 2D rooftop platformer made with Godot 4.7.2. Cross ten rooftop courses, collect fish medals, and use spring pads to clear large gaps. Balcony gardens, penthouse ledges, and walkable power lines or clotheslines offer alternate routes. If you fall, a helicopter takes you back to the last checkpoint. Rescues are unlimited.
+A 2D rooftop platformer made with Godot 4.7.2. Cross ten rooftop courses, collect fish medals, and use spring pads to clear large gaps. Balcony gardens, penthouse ledges, and walkable power lines or clotheslines offer alternate routes. If you fall, a helicopter takes you back to the last checkpoint. Rescues are unlimited, and clearing a course automatically unlocks and saves the next one so you can pick up the campaign later.
 
 ## Play
 
@@ -18,4 +18,5 @@ Open the project in Godot 4.7.2 and press **F5**. Choose **Play** on the title s
 ```sh
 godot --headless --editor --path . --import
 godot --headless --path . --quit-after 5
+PURRFECT_TEST_ALL_LEVELS=1 godot --headless --path .
 ```
