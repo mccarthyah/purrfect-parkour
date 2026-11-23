@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="460" height="156" viewBox="0 0 460 156">
+  <defs>
+    <linearGradient id="silver" x1="0" y1="0" x2="0" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff4da"/><stop offset="1" stop-color="#acd0cc"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0" y1="0" x2="0" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffe3a0"/><stop offset=".45" stop-color="#efb965"/><stop offset="1" stop-color="#d48547"/>
+    </linearGradient>
+  </defs>
+  <path fill="none" stroke="#9ac6bf" stroke-width="3" stroke-linecap="round" d="M9 42l17 5M6 53l19 1M10 65l15-4"/>
+  <path fill="none" stroke="#ba814e" stroke-width="3" stroke-linecap="round" d="M90 146q142 4 236-35m-75 32 64-21"/>
+  <path fill="none" stroke="#6b9699" stroke-width="2.5" d="m341 42 21-14 11 9 27-23 35 20"/>
+  <path fill="#edbc72" d="m427 43 3 7 8 3-8 3-3 8-3-8-8-3 8-3z"/>
+  <g transform="translate(43 39) rotate(-7) skewX(-10) scale(1.30 1.05)">
+    <path d="M2 6 0-16 19-2 31-14 35 7z" fill="#eadfd2"/>
+    <path d="M4-9 13-2 4 0zm26 1 2 7-8-1z" fill="#bd7b72"/>
+    <g fill="none" stroke-linecap="square" stroke-linejoin="bevel"><g transform="translate(0 3)" stroke="#13202e" stroke-width="16"><path transform="translate(0 0)" d="M1 4h35M18 4v40"/><path transform="translate(48 0)" d="M3 44 14 4h11l12 40M8 30h24"/><path transform="translate(96 0)" d="M4 4h20l8 7v8l-7 5H4m21 0 9 7v7l-8 6H4V4"/><path transform="translate(144 0)" d="M4 4h20l8 7v8l-7 5H4m21 0 9 7v7l-8 6H4V4"/><path transform="translate(192 0)" d="M3 4l16 22L35 4M19 26v18"/></g><g stroke="url(#silver)" stroke-width="10"><path transform="translate(0 0)" d="M1 4h35M18 4v40"/><path transform="translate(48 0)" d="M3 44 14 4h11l12 40M8 30h24"/><path transform="translate(96 0)" d="M4 4h20l8 7v8l-7 5H4m21 0 9 7v7l-8 6H4V4"/><path transform="translate(144 0)" d="M4 4h20l8 7v8l-7 5H4m21 0 9 7v7l-8 6H4V4"/><path transform="translate(192 0)" d="M3 4l16 22L35 4M19 26v18"/></g></g>
+  </g>
+  <g transform="translate(42 105) rotate(-7) skewX(-10) scale(1 .85)">
+    <path d="M371 42q33 16 47-9c9-15 1-29-8-25-5 2-6 9-1 13" fill="none" stroke="#15212d" stroke-width="13" stroke-linecap="round"/>
+    <path d="M371 40q33 16 47-9c9-15 1-29-8-25-5 2-6 9-1 13" fill="none" stroke="#e8a557" stroke-width="8" stroke-linecap="round"/>
+    <path d="M394 48l-2-7m15 2-3-7m13-2-7-3" fill="none" stroke="#a8603e" stroke-width="3" stroke-linecap="round"/>
+    <path d="m47 17-2-21 17 9 13-10 3 22z" fill="#ffe0a0"/>
+    <g fill="none" stroke-linecap="square" stroke-linejoin="bevel"><g transform="translate(0 3)" stroke="#13202e" stroke-width="16"><path transform="translate(0 0)" d="M4 44V4h20l8 8v8l-8 8H4m14 0 16 16"/><path transform="translate(48 0)" d="M12 5h12l8 8v23l-8 8H12l-8-8V13z"/><path transform="translate(96 0)" d="M12 5h12l8 8v23l-8 8H12l-8-8V13z"/><path transform="translate(144 0)" d="M4 44V4h30M4 23h23"/><path transform="translate(240 0)" d="M4 44V4h20l8 8v8l-8 8H4m14 0 16 16"/><path transform="translate(288 0)" d="M4 4v32l8 8h12l8-8V4"/><path transform="translate(336 0)" d="M4 44V4h3l25 40h2V4"/></g><g stroke="url(#amber)" stroke-width="10"><path transform="translate(0 0)" d="M4 44V4h20l8 8v8l-8 8H4m14 0 16 16"/><path transform="translate(48 0)" d="M12 5h12l8 8v23l-8 8H12l-8-8V13z"/><path transform="translate(96 0)" d="M12 5h12l8 8v23l-8 8H12l-8-8V13z"/><path transform="translate(144 0)" d="M4 44V4h30M4 23h23"/><path transform="translate(240 0)" d="M4 44V4h20l8 8v8l-8 8H4m14 0 16 16"/><path transform="translate(288 0)" d="M4 4v32l8 8h12l8-8V4"/><path transform="translate(336 0)" d="M4 44V4h3l25 40h2V4"/></g></g>
+    <path d="m58 22 5 3m6 0 5-3" fill="none" stroke="#efbd71" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,5 +1,7 @@
 extends Area2D
 
+const Art = preload("res://scripts/art.gd")
+
 var game
 var pulse := 0.0
 
@@ -14,18 +16,20 @@ func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 
 func _process(delta: float) -> void:
+	if game.state != "playing":
+		return
+	if not get_viewport_rect().grow(40).has_point(get_global_transform_with_canvas().origin):
+		return
 	pulse += delta * 5.0
 	queue_redraw()
 
 func _draw() -> void:
 	var squash := absf(sin(pulse)) * 3.0
-	draw_rect(Rect2(-34, -7 + squash, 68, 8), Color("f6c75f"))
-	draw_rect(Rect2(-30, -12 + squash, 60, 5), Color("fff1bd"))
-	for i in range(5):
-		var x := -23.0 + i * 11.5
-		draw_line(Vector2(x, -4 + squash), Vector2(x + 5, 0), Color("d98268"), 2.5, true)
-	draw_circle(Vector2(0, -13 + squash), 3, Color("fff9dc"))
+	Art.panel(self, Rect2(-34, -8, 68, 10), Color("a84f64"), 5, Art.INK, 2)
+	Art.panel(self, Rect2(-34, -16 + squash, 68, 13), Art.GOLD, 7, Art.INK, 2)
+	draw_line(Vector2(-23,-12 + squash), Vector2(23,-12 + squash), Art.CREAM, 2, true)
+	draw_polyline(PackedVector2Array([Vector2(-6,-20),Vector2(0,-25),Vector2(6,-20)]), Art.CREAM, 2.5, true)
 
 func _on_body_entered(body) -> void:
-	if body.is_in_group("cat") and body.velocity.y >= 0:
+	if game.state == "playing" and game.helicopter == null and body.is_in_group("cat") and body.velocity.y >= 0:
 		game.bounce_cat(body)

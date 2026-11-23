@@ -1,125 +1,113 @@
 extends Node2D
 
+const Art = preload("res://scripts/art.gd")
+const PANEL := Color("192430e6")
+const PANEL_BORDER := Color("536473")
+const TEXT := Color("eef1ee")
+const MUTED := Color("b8c5cf")
+const ACCENT := Color("edb963")
+const BUTTON_TEXT := Color("1d2429")
+const RESULTS_BUTTON := Rect2(355, 350, 250, 52)
+const SCREEN := Rect2(0, 0, 960, 540)
+
 var game
 var font: Font
-const INK := Color("283b52")
-const CREAM := Color("fff6df")
-const GOLD := Color("ffcf4e")
-const BUTTON := Rect2(365, 365, 230, 64)
+var heading: FontVariation
+var last_display: Array = []
 
 func _ready() -> void:
 	font = ThemeDB.fallback_font
+	heading = FontVariation.new()
+	heading.base_font = font
+	heading.variation_embolden = 0.85
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 func _process(_delta: float) -> void:
-	queue_redraw()
+	var display: Array = [game.state, game.level_number, game.rescue_count]
+	if game.state == "playing" or game.state == "paused":
+		display.append_array([game.score, game.district_name(), _progress()])
+		if game.state == "playing" and game.message_timer > 0:
+			display.append(game.message)
+	elif game.state == "won":
+		display.append(RESULTS_BUTTON.has_point(get_viewport().get_mouse_position()))
+	if display != last_display:
+		last_display = display
+		queue_redraw()
+
+func _progress() -> int:
+	return int(clampf(game.cat.position.x / game.finish_x * 100, 0, 100))
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		var point := get_viewport().get_mouse_position()
-		if game.state == "title" and BUTTON.has_point(point):
-			game.start_game()
-		elif game.state == "won" and BUTTON.has_point(point):
-			game.restart_game()
+	if game.state == "won" and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if RESULTS_BUTTON.has_point(event.position):
+			game.continue_game()
 
 func _draw() -> void:
 	if game == null:
 		return
-	if game.state == "title":
-		_draw_title()
-	elif game.state == "playing":
-		_draw_game_hud()
-		if game.message_timer > 0:
-			_draw_message(game.message)
-	elif game.state == "paused":
-		_draw_game_hud()
-		_draw_overlay("PAUSED", "Stretch those paws! Press Esc to keep going.", "Press Esc to resume")
-	elif game.state == "won":
-		_draw_win()
-
-func _draw_title() -> void:
-	_draw_panel(Rect2(200, 44, 560, 440), Color("fff5dc", 0.94))
-	_draw_text_center("PURRFECT PARKOUR", 133, 43, Color("e87961"))
-	_draw_text_center("Two rooftop districts for curious cats!", 169, 19, INK)
-	# Little decorative fish and paw prints
-	_draw_paw(Vector2(264, 215), 0.72, Color("f3ac67", 0.8))
-	_draw_paw(Vector2(702, 213), 0.72, Color("f3ac67", 0.8))
-	_draw_fish(Vector2(480, 224), 1.0)
-	_draw_text_center("Jump rooftops • climb trees • collect fish medals", 274, 16, INK)
-	_draw_text_center("Move: A / D or ← / →      Jump: Space / ↑", 308, 15, Color("59687a"))
-	_draw_text_center("At trees, hold ↑ or ↓ to climb!", 333, 15, Color("59687a"))
-	_draw_text_center("Air-pounce with a second jump; spring pads launch you!", 354, 13, Color("8a7d6d"))
-	var mouse := get_viewport().get_mouse_position()
-	var color := Color("f2a94e") if BUTTON.has_point(mouse) else Color("efb94f")
-	_draw_button(BUTTON, color, "LET'S PLAY!")
-	_draw_text_center("Tip: fish can be tucked above the rooftops.", 458, 13, Color("8a7d6d"))
+	match game.state:
+		"playing":
+			_draw_game_hud()
+			if game.message_timer > 0:
+				_draw_message(game.message)
+		"paused":
+			_draw_game_hud()
+			_draw_pause()
+		"won":
+			_draw_results()
 
 func _draw_game_hud() -> void:
-	_draw_panel(Rect2(18, 16, 180, 56), Color("fff5dc", 0.94))
-	_draw_fish(Vector2(43, 43), 0.62)
-	_draw_text("FISH  %02d / %02d" % [game.score, game.total_medals], Vector2(63, 49), 17, INK)
-	_draw_panel(Rect2(354, 16, 252, 42), Color("fff5dc", 0.82))
-	var district := "ROOFTOP RUN" if game.cat.position.x < 3400 else "MOONLIGHT MARKET"
-	var progress := int(clampf(game.cat.position.x / 6150.0 * 100, 0, 100))
-	_draw_text_center("%s  ✦  %d%%" % [district, progress], 44, 13, INK)
-	_draw_panel(Rect2(712, 16, 230, 56), Color("fff5dc", 0.92))
-	_draw_text("A / D  Move     SPACE  Jump", Vector2(726, 39), 11, INK)
-	_draw_text("↑ / ↓ climb • pads boost • ESC pause", Vector2(726, 57), 11, INK)
-	# Progress bar
-	draw_rect(Rect2(369, 54, 222, 4), Color("d8d2bd"))
-	draw_rect(Rect2(369, 54, 222 * clampf(game.cat.position.x / 6150.0, 0, 1), 4), Color("efad49"))
+	_draw_panel(Rect2(18, 16, 145, 64))
+	Art.medal(self, Vector2(39, 37), 0.54)
+	_draw_text("%02d / %02d" % [game.score, game.total_medals], Vector2(58, 43), 17, TEXT, heading)
 
-func _draw_message(text: String) -> void:
-	_draw_panel(Rect2(278, 80, 404, 42), Color("fff5dc", 0.94))
-	_draw_text_center(text, 107, 15, Color("b56058"))
+	_draw_text("RESCUES   %d" % game.rescue_count, Vector2(31, 67), 13, MUTED)
 
-func _draw_overlay(title: String, subtitle: String, footer: String) -> void:
-	draw_rect(Rect2(0, 0, 960, 540), Color(0.12, 0.2, 0.28, 0.45))
-	_draw_panel(Rect2(220, 170, 520, 200), Color("fff5dc", 0.97))
-	_draw_text_center(title, 238, 38, Color("e87961"))
-	_draw_text_center(subtitle, 285, 16, INK)
-	_draw_text_center(footer, 333, 15, Color("687384"))
+	_draw_panel(Rect2(331, 16, 298, 44))
+	_draw_center("%02d   /   %s" % [game.level_number, game.district_name().to_upper()], 40, 14, TEXT, heading)
+	draw_rect(Rect2(346, 49, 268, 2), PANEL_BORDER)
+	draw_rect(Rect2(346, 49, 268 * _progress() / 100.0, 2), ACCENT)
 
-func _draw_win() -> void:
-	draw_rect(Rect2(0, 0, 960, 540), Color(0.12, 0.2, 0.28, 0.48))
-	_draw_panel(Rect2(205, 80, 550, 390), Color("fff5dc", 0.97))
-	_draw_text_center("YOU DID IT, SUPER CAT!", 151, 34, Color("e87961"))
-	_draw_paw(Vector2(284, 219), 0.8, Color("f1af56"))
-	_draw_paw(Vector2(676, 218), 0.8, Color("f1af56"))
-	_draw_fish(Vector2(480, 211), 1.3)
-	_draw_text_center("Rooftop champion! Fish medals: %d / %d" % [game.score, game.total_medals], 272, 17, INK)
-	var praise := "A perfect catch! You found every fish!" if game.score == game.total_medals else "Every brave jump makes you better!"
-	_draw_text_center(praise, 303, 15, Color("657489"))
-	_draw_button(BUTTON, Color("efb94f"), "PLAY AGAIN")
-	_draw_text_center("Press Enter to take another run", 458, 13, Color("8a7d6d"))
+	_draw_panel(Rect2(771, 16, 171, 32))
+	_draw_text("PAUSE   Esc / Start", Vector2(786, 37), 13, MUTED)
 
-func _draw_button(rect: Rect2, color: Color, label: String) -> void:
-	draw_rect(Rect2(rect.position.x, rect.position.y+5, rect.size.x, rect.size.y), Color("bf8050"))
-	draw_rect(rect, color)
-	_draw_text_center(label, rect.position.y + 40, 23, Color("fffaf0"))
+func _draw_message(message: String) -> void:
+	var width := ceilf(font.get_string_size(message, HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x) + 36
+	_draw_panel(Rect2(480 - width / 2.0, 77, width, 34))
+	_draw_center(message, 99, 15, TEXT)
 
-func _draw_panel(rect: Rect2, color: Color) -> void:
-	draw_rect(Rect2(rect.position.x, rect.position.y+4, rect.size.x, rect.size.y), Color(0.14,0.19,0.25,0.14))
-	draw_rect(rect, color)
-	draw_rect(Rect2(rect.position.x+8, rect.position.y+7, rect.size.x-16, 2), Color(1,1,1,0.45))
+func _draw_pause() -> void:
+	draw_rect(SCREEN, Color(0.04, 0.07, 0.10, 0.60))
+	_draw_panel(Rect2(250, 168, 460, 204))
+	draw_rect(Rect2(458, 194, 44, 3), ACCENT)
+	_draw_center("PAUSED", 254, 44, TEXT, heading)
+	_draw_center("Esc or Start / Options to resume", 299, 16, MUTED)
+	_draw_center("Jump: Space or A / Cross  ·  Climb: Up / down", 335, 14, MUTED)
 
-func _draw_text_center(text: String, baseline: float, size: int, color: Color) -> void:
-	draw_string(font, Vector2(0, baseline), text, HORIZONTAL_ALIGNMENT_CENTER, 960, size, color)
+func _draw_results() -> void:
+	draw_rect(SCREEN, Color(0.04, 0.07, 0.10, 0.62))
+	_draw_panel(Rect2(218, 103, 524, 344))
+	draw_rect(Rect2(459, 130, 42, 3), ACCENT)
+	var more: bool = game.has_next_level()
+	var title := "LEVEL %02d COMPLETE" % game.level_number if more else "CAMPAIGN COMPLETE"
+	_draw_center(title, 182, 35, TEXT, heading)
+	_draw_center(game.level_name(), 216, 18, MUTED)
+	draw_line(Vector2(257, 239), Vector2(703, 239), PANEL_BORDER)
+	_draw_center("FISH MEDALS   /   RUN RESCUES %d" % game.rescue_count, 269, 13, MUTED)
+	_draw_center("%02d / %02d" % [game.score, game.total_medals], 319, 37, ACCENT, heading)
+	_draw_button(RESULTS_BUTTON, "NEXT LEVEL" if more else "PLAY AGAIN")
+	_draw_center("Enter or A / Cross", 428, 13, MUTED)
 
-func _draw_text(text: String, at: Vector2, size: int, color: Color) -> void:
-	draw_string(font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, size, color)
+func _draw_button(rect: Rect2, label: String) -> void:
+	var fill := ACCENT.lightened(0.18) if rect.has_point(get_viewport().get_mouse_position()) else ACCENT
+	Art.panel(self, rect, fill, 4)
+	draw_string(heading, rect.position + Vector2(0, 33), label, HORIZONTAL_ALIGNMENT_CENTER, rect.size.x, 19, BUTTON_TEXT)
 
-func _draw_fish(at: Vector2, scale: float) -> void:
-	draw_set_transform(at, 0, Vector2.ONE * scale)
-	draw_colored_polygon(PackedVector2Array([Vector2(-10,0),Vector2(-23,-10),Vector2(-21,10),Vector2(-10,2),Vector2(-3,10),Vector2(11,10),Vector2(19,4),Vector2(19,-4),Vector2(11,-10),Vector2(-3,-10)]), GOLD)
-	draw_circle(Vector2(12,-3), 1.6, INK)
-	draw_set_transform(Vector2.ZERO, 0, Vector2.ONE)
+func _draw_panel(rect: Rect2) -> void:
+	Art.panel(self, rect, PANEL, 5, PANEL_BORDER, 1)
 
-func _draw_paw(at: Vector2, scale: float, color: Color) -> void:
-	draw_set_transform(at, -0.2, Vector2.ONE * scale)
-	draw_circle(Vector2(0,5), 12, color)
-	draw_circle(Vector2(-13,-9), 5, color)
-	draw_circle(Vector2(-4,-14), 5, color)
-	draw_circle(Vector2(6,-14), 5, color)
-	draw_circle(Vector2(15,-8), 5, color)
-	draw_set_transform(Vector2.ZERO, 0, Vector2.ONE)
+func _draw_center(text: String, baseline: float, size: int, color: Color, face: Font = null) -> void:
+	draw_string(face if face else font, Vector2(0, baseline), text, HORIZONTAL_ALIGNMENT_CENTER, 960, size, color)
+
+func _draw_text(text: String, at: Vector2, size: int, color: Color, face: Font = null) -> void:
+	draw_string(face if face else font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, size, color)
